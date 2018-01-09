@@ -1,12 +1,15 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 
+import { Store } from '@ngrx/store';
+import { Observable } from 'rxjs/Observable';
+import * as fromStore from './../../store';
+
 import { Pizza } from '../../models/pizza.model';
-import { PizzasService } from '../../services/pizzas.service';
 
 @Component({
-  selector: 'products',
-  styleUrls: ['products.component.scss'],
-  template: `
+    selector: 'products',
+    styleUrls: ['products.component.scss'],
+    template: `
     <div class="products">
       <div class="products__new">
         <a
@@ -16,25 +19,27 @@ import { PizzasService } from '../../services/pizzas.service';
         </a>
       </div>
       <div class="products__list">
-        <div *ngIf="!((pizzas)?.length)">
+        <div *ngIf="!((pizzas$ | async)?.length)">
           No pizzas, add one to get started.
         </div>
         <pizza-item
-          *ngFor="let pizza of (pizzas)"
+          *ngFor="let pizza of (pizzas$ | async)"
           [pizza]="pizza">
         </pizza-item>
       </div>
     </div>
-  `,
+  `
 })
 export class ProductsComponent implements OnInit {
-  pizzas: Pizza[];
+    pizzas$: Observable<Pizza[]>;
 
-  constructor(private pizzaService: PizzasService) {}
+    constructor(private store: Store<fromStore.ProductState>) {}
 
-  ngOnInit() {
-    this.pizzaService.getPizzas().subscribe(pizzas => {
-      this.pizzas = pizzas;
-    });
-  }
+    ngOnInit() {
+        //this.pizzas$ = this.store.select(fromStore.getAllPizzas);
+        this.store.select(fromStore.getAllPizzas).subscribe(entities => {
+            console.log('en2', entities);
+        });
+        this.store.dispatch(new fromStore.LoadPizzas());
+    }
 }
