@@ -30,7 +30,7 @@ export const getPizzasEntities = createSelector(
 
 export const getAllPizzas = createSelector(getPizzasEntities, entities => {
     console.log('en', entities);
-    return [];
+    return Object.keys(entities).map(id => entities[parseInt(id, 10)]);
 });
 
 // export const getAllPizzas = createSelector(getPizzasEntities, entities => {
